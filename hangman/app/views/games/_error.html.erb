@@ -1,0 +1,12 @@
+<% if flash[:error] %>
+  <div id="error_explanation">
+    <h4>
+      <%= pluralize(flash[:error].count, "error") %> prohibited this entry:
+    </h4>
+    <ul>
+      <% flash[:error].each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

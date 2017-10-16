@@ -1,10 +1,18 @@
 <h1>Hangman</h1>
 
+
+
 <h2>Status</h2>
 
 <p>
-  <strong>Secret Word (remove after testing):</strong>
-  <%= @game.secretword %>
+  <strong>The Word:</strong>
+  <% @game.masked_letters.each do |letter| %>
+    <% if letter %>
+      <%= letter %>
+    <% else %>
+      <%= '_' %>
+    <% end %>
+  <% end %>
 </p>
 
 <p>
@@ -17,29 +25,60 @@
   <%= @game.remaining_lives %>
 </p>
 
-<h2>Guesses</h2>
 <p>
-  <strong>Guess:</strong>
-  <% @game.masked_letters.each do |letter| %>
-    <% if letter %>
+  <strong>Guesses so far:</strong>
+  <% if @game.guessed_letters.empty? %>
+    <%= 'no guesses have been made' %>
+  <% else %>
+    <% @game.guessed_letters.each do |letter| %>
       <%= letter %>
-    <% else %>
-      <%= '_' %>
     <% end %>
-
   <% end %>
 </p>
 
-<h2>Make a Guess:</h2>
-<%= form_with(model: [ @game, @game.guesses.build ], local: true) do |form| %>
+
+
+<% if @game.game_finished? %>
+
+  <h2>Results</h2>
+  <% if @game.won? %>
+    <p>
+      <strong>You WON!</strong>
+    </p>
+  <% else %>
+    <p>
+      <strong>You LOST!</strong>
+    </p>
+  <% end %>
   <p>
-    <%= form.label :letter %><br>
-    <%= form.text_field :letter %>
+    <strong>The word was:</strong>
+    <%= @game.secretword %>
   </p>
-  <p>
-    <%= form.submit %>
-  </p>
+
+<% else %>
+
+  <h2>Make a Guess:</h2>
+  <%= form_with(model: [ @game, @game.guesses.build ], local: true) do |form| %>
+
+    <%= render 'error' %>
+
+    <p>
+      <%= form.label :letter %>
+      <%= form.text_field :letter %>
+      <%= form.submit %>
+    </p>
+  <% end %>
+
 <% end %>
+
+
 
 <%= link_to 'Edit', edit_game_path(@game) %>
 <%= link_to 'Back', games_path %>
+
+
+
+<p>
+  <strong>Remove after testing:</strong>
+  <%= @game.secretword %>
+</p>

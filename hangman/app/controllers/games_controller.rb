@@ -11,6 +11,7 @@ class GamesController < ApplicationController
     @game = Game.new
   end
 
+  # TODO remove not required
   def edit
     @game = Game.find(params[:id])
   end
@@ -18,24 +19,27 @@ class GamesController < ApplicationController
   def create
     @game = Game.new(game_params)
 
-    if
-      @game.save
+    if @game.save
       redirect_to @game
     else
+      flash[:error] = @game.errors.full_messages
       render 'new'
     end
   end
 
+  # TODO remove not required
   def update
     @game = Game.find(params[:id])
 
     if @game.update(game_params)
       redirect_to @game
     else
+      flash[:error] = @game.errors.full_messages
       render 'edit'
     end
   end
 
+  # TODO remove not required
   def destroy
     @game = Game.find(params[:id])
     @game.destroy
