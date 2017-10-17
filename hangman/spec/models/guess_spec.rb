@@ -38,7 +38,7 @@ RSpec.describe Guess, type: :model do
       end
     end
 
-    context "when given letter which is long enough but contains non-alphabetic characters" do
+    context "when given letter which is correct length but contains non-alphabetic characters" do
       let(:letter) { '$' }
       let(:test_errors) { [alphabetic] }
 
@@ -66,7 +66,7 @@ RSpec.describe Guess, type: :model do
       end
     end
 
-    context "when given letter is not unique" do
+    context "when given letter which is not unique" do
       let(:test_errors) { [unique] }
 
       before do

@@ -24,7 +24,7 @@ class Game < ApplicationRecord
   end
 
   def lost?
-    !all_letters_guessed? && lives <= 0
+    lives <= 0
   end
 
   private
