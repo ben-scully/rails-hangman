@@ -7,10 +7,6 @@ class Game < ApplicationRecord
 
   before_save :downcase_fields
 
-  def downcase_fields
-     self.secret_word.downcase!
-  end
-
   def guessed_letters
     guesses.pluck(:letter)
   end
@@ -35,5 +31,9 @@ class Game < ApplicationRecord
 
   def all_letters_guessed?
     (secret_word.chars - guessed_letters).empty?
+  end
+
+  def downcase_fields
+     self.secret_word.downcase!
   end
 end

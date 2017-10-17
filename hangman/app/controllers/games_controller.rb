@@ -45,7 +45,7 @@ class GamesController < ApplicationController
   private
 
   def game_params
-    params.require(:game).permit(:secret_word, :text)
+    params.require(:game).permit(:secret_word)
   end
 
   def find_game

@@ -8,6 +8,8 @@ class Guess < ApplicationRecord
 
   before_save :downcase_fields
 
+  private
+
   def downcase_fields
      self.letter.downcase!
   end
