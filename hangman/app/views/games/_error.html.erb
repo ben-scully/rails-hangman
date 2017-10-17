@@ -1,10 +1,11 @@
-<% if flash[:error] %>
+<% if @game.errors.any? %>
   <div id="error_explanation">
-    <h4>
-      <%= pluralize(flash[:error].count, "error") %> prohibited this entry:
-    </h4>
+    <h2>
+      <%= pluralize(@game.errors.count, "error") %> prohibited
+      this game from being saved:
+    </h2>
     <ul>
-      <% flash[:error].each do |msg| %>
+      <% @game.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
     </ul>

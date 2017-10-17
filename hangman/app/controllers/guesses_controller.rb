@@ -1,17 +1,16 @@
 class GuessesController < ApplicationController
   def create
-    @game = Game.find(params[:game_id])
-    @guess = @game.guesses.create(guess_params)
+    game = Game.find(params[:game_id])
+    guess = game.guesses.new(guess_params)
 
-    if !@guess.valid?
-      flash[:error] = @guess.errors.full_messages
-    end
+    flash[:error] = guess.errors.full_messages unless guess.save
 
-    redirect_to game_path(@game)
+    redirect_to game
   end
 
   private
-    def guess_params
-      params.require(:guess).permit(:letter)
-    end
+
+  def guess_params
+    params.require(:guess).permit(:letter)
+  end
 end

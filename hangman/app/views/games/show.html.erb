@@ -1,84 +1,13 @@
 <h1>Hangman</h1>
 
+<%= render 'game_information' %>
 
-
-<h2>Status</h2>
-
-<p>
-  <strong>The Word:</strong>
-  <% @game.masked_letters.each do |letter| %>
-    <% if letter %>
-      <%= letter %>
-    <% else %>
-      <%= '_' %>
-    <% end %>
-  <% end %>
-</p>
-
-<p>
-  <strong>Word Length:</strong>
-  <%= @game.secretword.length %>
-</p>
-
-<p>
-  <strong>Remaining Lives:</strong>
-  <%= @game.remaining_lives %>
-</p>
-
-<p>
-  <strong>Guesses so far:</strong>
-  <% if @game.guessed_letters.empty? %>
-    <%= 'no guesses have been made' %>
-  <% else %>
-    <% @game.guessed_letters.each do |letter| %>
-      <%= letter %>
-    <% end %>
-  <% end %>
-</p>
-
-
-
-<% if @game.game_finished? %>
-
-  <h2>Results</h2>
-  <% if @game.won? %>
-    <p>
-      <strong>You WON!</strong>
-    </p>
-  <% else %>
-    <p>
-      <strong>You LOST!</strong>
-    </p>
-  <% end %>
-  <p>
-    <strong>The word was:</strong>
-    <%= @game.secretword %>
-  </p>
-
-<% else %>
-
-  <h2>Make a Guess:</h2>
-  <%= form_with(model: [ @game, @game.guesses.build ], local: true) do |form| %>
-
-    <%= render 'error' %>
-
-    <p>
-      <%= form.label :letter %>
-      <%= form.text_field :letter %>
-      <%= form.submit %>
-    </p>
-  <% end %>
-
-<% end %>
-
-
+<%= render 'game_result' %>
 
 <%= link_to 'Edit', edit_game_path(@game) %>
 <%= link_to 'Back', games_path %>
 
-
-
 <p>
   <strong>Remove after testing:</strong>
-  <%= @game.secretword %>
+  <%= @game.secret_word %>
 </p>

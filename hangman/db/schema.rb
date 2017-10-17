@@ -13,13 +13,13 @@
 ActiveRecord::Schema.define(version: 20171015231753) do
 
   create_table "games", force: :cascade do |t|
-    t.string "secretword"
+    t.string "secret_word", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "guesses", force: :cascade do |t|
-    t.string "letter"
+    t.string "letter", limit: 1, null: false
     t.integer "game_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

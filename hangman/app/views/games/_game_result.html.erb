@@ -1,0 +1,9 @@
+<% if @game.game_finished? %>
+
+  <%= render 'game_success' %>
+
+<% else %>
+
+  <%= render 'make_guess' %>
+
+<% end %>
