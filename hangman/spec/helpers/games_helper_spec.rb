@@ -43,7 +43,7 @@ RSpec.describe GamesHelper, type: :helper do
   end
 
   describe '#guessed_letters' do
-    let(:guesses_string) { 'no guesses made' }
+    let(:guesses_string) { GamesHelper::NO_GUESS_MADE }
 
     context 'when given no guesses' do
       let(:guesses) { [] }

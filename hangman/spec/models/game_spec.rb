@@ -1,55 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
+  let(:game_has_not_begun) { "Game #{GamesHelper::UNCHANGEABLE_AFTER_GUESS_MADE}" }
+  let(:presence_of) { "Secret word can't be blank" }
+  let(:length_of) { "Secret word is too short (minimum is 3 characters)" }
+  let(:format_of) { "Secret word #{GamesHelper::ONLY_ALPHABETIC}" }
   let(:secret_word) { 'pirates' }
 
-  subject(:game) { described_class.new(secret_word: secret_word) }
+  subject(:game) { described_class.create(secret_word: secret_word) }
 
-  before do
-    game.save
-  end
-
-  describe "create" do
-    context "when secret_word is nil" do
-      let(:secret_word) { nil }
-
-      it "returns invalid" do
-        expect(game).not_to be_valid
-      end
-    end
-
-    context "when secret_word is empty string" do
-      let(:secret_word) { '' }
-
-      it "returns invalid" do
-        expect(game).not_to be_valid
-      end
-    end
-
-    context "when secret_word is too short" do
-      let(:secret_word) { 'as' }
-
-      it "returns invalid" do
-        expect(game).not_to be_valid
-      end
-    end
-
-    context "when secret_word is too short and contains non-alphabetic characters" do
-      let(:secret_word) { 'a2' }
-
-      it "returns invalid" do
-        expect(game).not_to be_valid
-      end
-    end
-
-    context "when secret_word is long enough but contains non-alphabetic characters" do
-      let(:secret_word) { 'a2dfs$' }
-
-      it "returns invalid" do
-        expect(game).not_to be_valid
-      end
-    end
-
+  describe 'valid create' do
     context "when secret_word is valid" do
       it "returns valid" do
         expect(game).to be_valid
@@ -57,12 +17,95 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  describe 'post create' do
+  describe 'invalid create' do
+    let(:game_errors) { game.errors.full_messages.sort }
+
+    context "when secret_word is nil" do
+      let(:secret_word) { nil }
+      let(:errors) { [presence_of, length_of, format_of].sort }
+
+      it "returns invalid" do
+        expect(game).not_to be_valid
+        expect(game_errors).to eql(errors)
+      end
+    end
+
+    context "when secret_word is empty string" do
+      let(:secret_word) { '' }
+      let(:errors) { [presence_of, length_of, format_of].sort }
+
+      it "returns invalid" do
+        expect(game).not_to be_valid
+        expect(game_errors).to eql(errors)
+      end
+    end
+
+    context "when secret_word is too short" do
+      let(:secret_word) { 'as' }
+      let(:errors) { [length_of].sort }
+
+      it "returns invalid" do
+        expect(game).not_to be_valid
+        expect(game_errors).to eql(errors)
+      end
+    end
+
+    context "when secret_word is too short and contains non-alphabetic characters" do
+      let(:secret_word) { 'a2' }
+      let(:errors) { [length_of, format_of].sort }
+
+      it "returns invalid" do
+        expect(game).not_to be_valid
+        expect(game_errors).to eql(errors)
+      end
+    end
+
+    context "when secret_word is long enough but contains non-alphabetic characters" do
+      let(:secret_word) { 'a2dfs$' }
+      let(:errors) { [format_of].sort }
+
+      it "returns invalid" do
+        expect(game).not_to be_valid
+        expect(game_errors).to eql(errors)
+      end
+    end
+  end
+
+  describe 'post valid create' do
     context "when secret_word contains uppercase characters" do
       let(:secret_word) { 'PIRATES' }
+      let(:secret_word_downcase) { 'pirates' }
 
       it "returns downcased secret_word" do
-        expect(game.secret_word).to eql(secret_word.downcase)
+        expect(game.secret_word).to eql(secret_word_downcase)
+      end
+    end
+  end
+
+  describe 'invalid update' do
+    let(:secret_word_update) { 'pira' }
+
+    before do
+      game.update(secret_word: secret_word_update)
+    end
+
+    context "when Game is updated before a Guess has been made" do
+      it "returns valid" do
+        expect(game).to be_valid
+      end
+    end
+
+    context "when Game is updated after a Guess has been made" do
+      let(:game_errors) { game.errors.full_messages.sort }
+      let(:errors) { [game_has_not_begun].sort }
+
+      before do
+        game.guesses.create(letter: 'p')
+      end
+
+      it "returns invalid" do
+        expect(game).not_to be_valid
+        expect(game_errors).to eql(errors)
       end
     end
   end
@@ -78,8 +121,7 @@ RSpec.describe Game, type: :model do
 
     context "after a guess" do
       before do
-        guess = Guess.new(game: game, letter: letter)
-        guess.save
+        game.guesses.create!(letter: letter)
       end
 
       context "one incorrect guess" do
@@ -107,7 +149,7 @@ RSpec.describe Game, type: :model do
   end
 
   def new_guess(game, letter)
-    Guess.new(game: game, letter: letter).save
+    game.guesses.create!(letter: letter).save
   end
 
   describe '#guessed_letters' do
@@ -134,10 +176,8 @@ RSpec.describe Game, type: :model do
 
   describe '#game_finished?' do
     context "post create" do
-      let(:finshed) { false }
-
       it "returns game not finished" do
-        expect(game.game_finished?).to eql(finshed)
+        expect(game.game_finished?).to be false
       end
     end
 
@@ -149,19 +189,16 @@ RSpec.describe Game, type: :model do
       end
 
       context "when won" do
-        let(:finshed) { true }
-
         it "returns game finished" do
-          expect(game.game_finished?).to eql(finshed)
+          expect(game.game_finished?).to be true
         end
       end
 
       context "when lost" do
-        let(:finshed) { true }
         let(:letters) { %w[z q w l m g y] }
 
         it "returns game finished" do
-          expect(game.game_finished?).to eql(finshed)
+          expect(game.game_finished?).to be true
         end
       end
     end
@@ -169,22 +206,12 @@ RSpec.describe Game, type: :model do
 
   describe '#won?' do
     context "post create" do
-      let(:won) { false }
-
       it "returns game not won" do
-        expect(game.won?).to eql(won)
+        expect(game.won?).to be false
       end
     end
 
     context 'game has finished' do
-      def new_guesses(game, letters)
-        letters.map { |letter| new_guess(game, letter) }
-      end
-
-      def new_guess(game, letter)
-        Guess.new(game: game, letter: letter).save
-      end
-
       let(:letters) { %w[p i r a t e s] }
 
       before do
@@ -192,28 +219,24 @@ RSpec.describe Game, type: :model do
       end
 
       context "when every letter has been guessed" do
-        let(:won) { true }
-
         it "returns game won" do
-          expect(game.won?).to eql(won)
+          expect(game.won?).to be true
         end
       end
 
       context "when all lives are gone" do
-        let(:won) { false }
         let(:letters) { %w[z q w l m g y] }
 
         it "returns game won" do
-          expect(game.won?).to eql(won)
+          expect(game.won?).to be false
         end
       end
 
       context "when every letter has been guessed but all lives have been lost" do
-        let(:won) { false }
         let(:letters) { %w[z q w l m g y p i r a t e s] }
 
         it "returns game not won" do
-          expect(game.won?).to eql(won)
+          expect(game.won?).to be false
         end
       end
     end
@@ -221,22 +244,12 @@ RSpec.describe Game, type: :model do
 
   describe '#lost?' do
     context "post create" do
-      let(:lost) { false }
-
       it "returns game not lost" do
-        expect(game.lost?).to eql(lost)
+        expect(game.lost?).to be false
       end
     end
 
     context 'game has finished' do
-      def new_guesses(game, letters)
-        letters.map { |letter| new_guess(game, letter) }
-      end
-
-      def new_guess(game, letter)
-        Guess.new(game: game, letter: letter).save
-      end
-
       let(:letters) { %w[p i r a t e s] }
 
       before do
@@ -244,28 +257,24 @@ RSpec.describe Game, type: :model do
       end
 
       context "when every letter has been guessed" do
-        let(:lost) { false }
-
         it "returns game lost" do
-          expect(game.lost?).to eql(lost)
+          expect(game.lost?).to be false
         end
       end
 
       context "when all lives are gone" do
-        let(:lost) { true }
         let(:letters) { %w[z q w l m g y] }
 
         it "returns game lost" do
-          expect(game.lost?).to eql(lost)
+          expect(game.lost?).to be true
         end
       end
 
       context "when every letter has been guessed but all lives have been lost" do
-        let(:lost) { true }
         let(:letters) { %w[z q w l m g y p i r a t e s] }
 
         it "returns game not lost" do
-          expect(game.lost?).to eql(lost)
+          expect(game.lost?).to be true
         end
       end
     end

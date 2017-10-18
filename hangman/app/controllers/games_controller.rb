@@ -12,7 +12,6 @@ class GamesController < ApplicationController
     @game = Game.new
   end
 
-  # TODO remove not required
   def edit
   end
 
@@ -26,7 +25,6 @@ class GamesController < ApplicationController
     end
   end
 
-  # TODO remove not required
   def update
     if @game.update(game_params)
       redirect_to @game
@@ -35,7 +33,6 @@ class GamesController < ApplicationController
     end
   end
 
-  # TODO remove not required
   def destroy
     @game.destroy
 

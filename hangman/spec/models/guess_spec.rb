@@ -1,75 +1,105 @@
 require 'rails_helper'
 
 RSpec.describe Guess, type: :model do
+  let(:presence_of) { "Letter can't be blank" }
+  let(:length_of) { "Letter is too long (maximum is 1 character)" }
+  let(:format_of) { "Letter #{GuessesHelper::ONLY_ALPHABETIC}" }
+  let(:uniqueness_of) { "Letter #{GuessesHelper::REPEATED_GUESS}" }
   let(:letter) { 'p' }
-  let(:game) { Game.new(secret_word: 'pirate') }
-  let(:guess) { Guess.new(game: game, letter: letter) }
+  let(:game) { Game.create!(secret_word: 'pirate') }
+  let(:guess) { game.guesses.create(letter: letter) }
 
-  before do
-    guess.save
+  describe 'valid create' do
+    context "when letter is valid" do
+      it "returns valid" do
+        expect(guess).to be_valid
+      end
+    end
   end
 
-  describe "create" do
-    context "when letter is nil" do
-      let(:letter) { nil }
+  describe "invalid create" do
+    # TODO is this testing rais?
+    context "when Guess doesn't belong to a Game" do
+      let(:letter) { 'w' }
+      let(:guess) { Guess.create(letter: letter) }
 
       it "returns invalid" do
         expect(guess).not_to be_valid
+      end
+    end
+
+    let(:guess_errors) { guess.errors.full_messages.sort }
+
+    context "when letter is nil" do
+      let(:letter) { nil }
+      let(:errors) { [presence_of, format_of].sort }
+
+      it "returns invalid" do
+        expect(guess).not_to be_valid
+        expect(guess_errors).to eql(errors)
       end
     end
 
     context "when letter is an empty string" do
       let(:letter) { '' }
+      let(:errors) { [presence_of, format_of].sort }
 
       it "returns invalid" do
         expect(guess).not_to be_valid
+        expect(guess_errors).to eql(errors)
       end
     end
 
     context "when letter is non-alphabetic" do
       let(:letter) { '$' }
+      let(:errors) { [format_of].sort }
 
       it "returns invalid" do
         expect(guess).not_to be_valid
+        expect(guess_errors).to eql(errors)
       end
     end
 
     context "when given multiple characters instead of one letter" do
       let(:letter) { 'wizard' }
+      let(:errors) { [length_of].sort }
 
       it "returns invalid" do
         expect(guess).not_to be_valid
+        expect(guess_errors).to eql(errors)
       end
     end
 
-    context "when Guess doesn't belong to a Game" do
-      let(:letter) { 'w' }
-      let(:guess) { Guess.new(letter: letter) }
+    context "when given multiple characters instead of one letter including non-alphabetic" do
+      let(:letter) { 'wi77rd' }
+      let(:errors) { [length_of, format_of].sort }
 
       it "returns invalid" do
         expect(guess).not_to be_valid
+        expect(guess_errors).to eql(errors)
       end
     end
 
+    # TODO why doesn't this work?
     context "when given letter which is not unique" do
-      let(:guess2) { Guess.new(game: game, letter: letter) }
-
-      before do
-        guess2.save
-      end
+      let(:guess2) { game.guesses.create(letter: letter) }
+      let(:guess_errors2) { guess2.errors.full_messages.sort }
+      let(:errors) { [uniqueness_of].sort }
 
       it "returns invalid" do
         expect(guess2).not_to be_valid
+        expect(guess_errors2).to eql(errors)
       end
     end
   end
 
-  describe 'post create' do
+  describe 'post valid create' do
     context "when letter is uppercase" do
       let(:letter) { 'P' }
+      let(:letter_downcase) { 'p' }
 
       it "returns valid" do
-        expect(guess).to be_valid
+        expect(guess.letter).to eql(letter_downcase)
       end
     end
   end

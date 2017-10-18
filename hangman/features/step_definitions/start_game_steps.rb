@@ -9,5 +9,5 @@ When /^I start a new game$/ do
 end
 
 Then /^I should see a new game screen$/ do
-  page.has_content?("New Game")
+  expect(page).to have_content("New Game")
 end

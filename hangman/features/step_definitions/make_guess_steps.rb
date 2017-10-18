@@ -1,7 +1,7 @@
 # features/step_definitions/make_guess_steps.rb
 
 Given /^A game already exists$/ do
-  @game = Game.create(secret_word: 'pirate')
+  @game = Game.create!(secret_word: 'pirate')
 end
 
 Given /^I am on the hangman page$/ do

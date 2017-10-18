@@ -1,9 +1,10 @@
 class Game < ApplicationRecord
   has_many :guesses, dependent: :destroy
 
+  validate :game_has_not_begun?
   validates_presence_of :secret_word
   validates_length_of :secret_word, :minimum => 3
-  validates_format_of :secret_word, :with => /\A[a-z]+\z/i, message: "is only allowed to contain alphabetic characters [s,w,g NOT @,*,4]"
+  validates_format_of :secret_word, :with => /\A[a-z]+\z/i, message: GamesHelper::ONLY_ALPHABETIC
 
   before_save :downcase_fields
 
@@ -12,7 +13,15 @@ class Game < ApplicationRecord
   end
 
   def lives
-    secret_word.chars.size - (guessed_letters - secret_word.chars).size
+    secret_letters.size - incorrect_guesses.size
+  end
+
+  def secret_letters
+    secret_word.chars
+  end
+
+  def incorrect_guesses
+    guessed_letters - secret_letters
   end
 
   def game_finished?
@@ -30,7 +39,11 @@ class Game < ApplicationRecord
   private
 
   def all_letters_guessed?
-    (secret_word.chars - guessed_letters).empty?
+    (secret_letters - guessed_letters).empty?
+  end
+
+  def game_has_not_begun?
+    errors.add(:game, GamesHelper::UNCHANGEABLE_AFTER_GUESS_MADE) unless guesses.empty?
   end
 
   def downcase_fields

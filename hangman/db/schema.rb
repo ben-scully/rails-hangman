@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171015231753) do
+ActiveRecord::Schema.define(version: 20171018232959) do
 
   create_table "games", force: :cascade do |t|
     t.string "secret_word", null: false
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 20171015231753) do
     t.integer "game_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["game_id", "letter"], name: "index_guesses_on_game_id_and_letter", unique: true
     t.index ["game_id"], name: "index_guesses_on_game_id"
   end
 
