@@ -8,6 +8,6 @@ When /^I start a new game$/ do
   click_link('New Game')
 end
 
-Then /^I should see a new game screen$/ do
+Then /^I should see a new game$/ do
   expect(page).to have_content("New Game")
 end

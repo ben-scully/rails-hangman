@@ -136,7 +136,7 @@ RSpec.describe Game, type: :model do
       context "one correct guess" do
         let(:letter) { 'p' }
 
-        it "returns original lives less one" do
+        it "returns original lives" do
           expect(game.lives).to eql(lives)
         end
       end
@@ -166,7 +166,7 @@ RSpec.describe Game, type: :model do
     end
 
     context "guessed have been made" do
-      let(:guessed_letters) { %w[p i r a t e s] }
+      let(:guessed_letters) { %w[p i r a t e s].sort }
 
       it "returns guessed letters" do
         expect(game.guessed_letters).to eql(guessed_letters)
@@ -177,12 +177,13 @@ RSpec.describe Game, type: :model do
   describe '#game_finished?' do
     context "post create" do
       it "returns game not finished" do
-        expect(game.game_finished?).to be false
+        expect(game).not_to be_game_finished
       end
     end
 
     context 'game has finished' do
-      let(:letters) { %w[p i r a t e s] }
+      # TODO use / ask about fixtures
+      let(:letters) { secret_word.chars }
 
       before do
         new_guesses(game, letters)
@@ -190,7 +191,7 @@ RSpec.describe Game, type: :model do
 
       context "when won" do
         it "returns game finished" do
-          expect(game.game_finished?).to be true
+          expect(game).to be_game_finished
         end
       end
 
@@ -198,7 +199,7 @@ RSpec.describe Game, type: :model do
         let(:letters) { %w[z q w l m g y] }
 
         it "returns game finished" do
-          expect(game.game_finished?).to be true
+          expect(game).to be_game_finished
         end
       end
     end
@@ -207,7 +208,7 @@ RSpec.describe Game, type: :model do
   describe '#won?' do
     context "post create" do
       it "returns game not won" do
-        expect(game.won?).to be false
+        expect(game).not_to be_won
       end
     end
 
@@ -220,7 +221,7 @@ RSpec.describe Game, type: :model do
 
       context "when every letter has been guessed" do
         it "returns game won" do
-          expect(game.won?).to be true
+          expect(game).to be_won
         end
       end
 
@@ -228,7 +229,7 @@ RSpec.describe Game, type: :model do
         let(:letters) { %w[z q w l m g y] }
 
         it "returns game won" do
-          expect(game.won?).to be false
+          expect(game).not_to be_won
         end
       end
 
@@ -236,7 +237,7 @@ RSpec.describe Game, type: :model do
         let(:letters) { %w[z q w l m g y p i r a t e s] }
 
         it "returns game not won" do
-          expect(game.won?).to be false
+          expect(game).not_to be_won
         end
       end
     end
@@ -245,7 +246,7 @@ RSpec.describe Game, type: :model do
   describe '#lost?' do
     context "post create" do
       it "returns game not lost" do
-        expect(game.lost?).to be false
+        expect(game).not_to be_lost
       end
     end
 
@@ -258,7 +259,7 @@ RSpec.describe Game, type: :model do
 
       context "when every letter has been guessed" do
         it "returns game lost" do
-          expect(game.lost?).to be false
+          expect(game).not_to be_lost
         end
       end
 
@@ -266,7 +267,7 @@ RSpec.describe Game, type: :model do
         let(:letters) { %w[z q w l m g y] }
 
         it "returns game lost" do
-          expect(game.lost?).to be true
+          expect(game).to be_lost
         end
       end
 
@@ -274,7 +275,7 @@ RSpec.describe Game, type: :model do
         let(:letters) { %w[z q w l m g y p i r a t e s] }
 
         it "returns game not lost" do
-          expect(game.lost?).to be true
+          expect(game).to be_lost
         end
       end
     end

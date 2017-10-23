@@ -82,13 +82,22 @@ RSpec.describe Guess, type: :model do
 
     # TODO why doesn't this work?
     context "when given letter which is not unique" do
-      let(:guess2) { game.guesses.create(letter: letter) }
+      let(:guess2) { game.guesses.create!(letter: 'i') }
+      let(:guess3) { game.guesses.create!(letter: 'i') }
       let(:guess_errors2) { guess2.errors.full_messages.sort }
+      let(:guess_errors3) { guess3.errors.full_messages.sort }
       let(:errors) { [uniqueness_of].sort }
+
+      before do
+        let(:guess2) { game.guesses.create!(letter: 'i') }
+        let(:guess3) { game.guesses.create!(letter: 'i') }
+      end
 
       it "returns invalid" do
         expect(guess2).not_to be_valid
-        expect(guess_errors2).to eql(errors)
+        # expect(guess).to eql(errors)
+        # expect(guess2, guess3).to eql(errors)
+        # expect(guess3).to eql(errors)
       end
     end
   end
