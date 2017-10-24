@@ -1,8 +1,8 @@
 # features/start_game.feature
 
-Feature: Create a Game
+Feature: Start a game
 
-  Scenario: Create a new Game
+  Scenario: From the homepage
     Given I am on the home page
     When I start a new game
     Then I should see a new game

@@ -1,13 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe Game, type: :model do
-  let(:game_has_not_begun) { "Game #{GamesHelper::UNCHANGEABLE_AFTER_GUESS_MADE}" }
+  let(:game_has_not_begun) { "Game #{Game::UNCHANGEABLE_AFTER_GUESS_MADE}" }
   let(:presence_of) { "Secret word can't be blank" }
   let(:length_of) { "Secret word is too short (minimum is 3 characters)" }
-  let(:format_of) { "Secret word #{GamesHelper::ONLY_ALPHABETIC}" }
+  let(:format_of) { "Secret word #{Game::ONLY_ALPHABETIC}" }
   let(:secret_word) { 'pirates' }
 
   subject(:game) { described_class.create(secret_word: secret_word) }
+
+  def new_guesses(game, letters)
+    letters.map { |letter| new_guess(game, letter) }
+  end
+
+  def new_guess(game, letter)
+    game.guesses.create!(letter: letter).save
+  end
 
   describe 'valid create' do
     context "when secret_word is valid" do
@@ -143,15 +151,6 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  # TODO where do I put these helpers?
-  def new_guesses(game, letters)
-    letters.map { |letter| new_guess(game, letter) }
-  end
-
-  def new_guess(game, letter)
-    game.guesses.create!(letter: letter).save
-  end
-
   describe '#guessed_letters' do
     let(:guessed_letters) { [] }
 
@@ -159,7 +158,7 @@ RSpec.describe Game, type: :model do
       new_guesses(game, guessed_letters)
     end
 
-    context "post create" do
+    context 'new game' do
       it "returns no guesses" do
         expect(game.guessed_letters).to eql(guessed_letters)
       end
@@ -174,15 +173,14 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  describe '#game_finished?' do
-    context "post create" do
+  describe '#finished?' do
+    context 'new game' do
       it "returns game not finished" do
-        expect(game).not_to be_game_finished
+        expect(game).not_to be_finished
       end
     end
 
     context 'game has finished' do
-      # TODO use / ask about fixtures
       let(:letters) { secret_word.chars }
 
       before do
@@ -191,7 +189,7 @@ RSpec.describe Game, type: :model do
 
       context "when won" do
         it "returns game finished" do
-          expect(game).to be_game_finished
+          expect(game).to be_finished
         end
       end
 
@@ -199,7 +197,7 @@ RSpec.describe Game, type: :model do
         let(:letters) { %w[z q w l m g y] }
 
         it "returns game finished" do
-          expect(game).to be_game_finished
+          expect(game).to be_finished
         end
       end
     end

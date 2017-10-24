@@ -1,12 +1,16 @@
 class Game < ApplicationRecord
+  ONLY_ALPHABETIC = "is only allowed to contain alphabetic characters [s,w,g NOT @,*,4]"
+  UNCHANGEABLE_AFTER_GUESS_MADE = "in unable to be changed once a Guess has been made"
+
   has_many :guesses, dependent: :destroy
 
-  validate :game_has_not_begun?
+  validate :has_not_begun?
+
   validates_presence_of :secret_word
   validates_length_of :secret_word, :minimum => 3
-  validates_format_of :secret_word, :with => /\A[a-z]+\z/i, message: GamesHelper::ONLY_ALPHABETIC
+  validates_format_of :secret_word, :with => /\A[a-z]+\z/i, message: ONLY_ALPHABETIC
 
-  before_save :downcase_fields
+  before_save :downcase_secret_word!
 
   def guessed_letters
     guesses.pluck(:letter)
@@ -24,7 +28,7 @@ class Game < ApplicationRecord
     guessed_letters - secret_letters
   end
 
-  def game_finished?
+  def finished?
     won? || lost?
   end
 
@@ -42,11 +46,11 @@ class Game < ApplicationRecord
     (secret_letters - guessed_letters).empty?
   end
 
-  def game_has_not_begun?
-    errors.add(:game, GamesHelper::UNCHANGEABLE_AFTER_GUESS_MADE) unless guesses.empty?
+  def has_not_begun?
+    errors.add(:game, UNCHANGEABLE_AFTER_GUESS_MADE) unless guesses.empty?
   end
 
-  def downcase_fields
+  def downcase_secret_word!
      self.secret_word.downcase!
   end
 end

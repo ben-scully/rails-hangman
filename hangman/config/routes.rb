@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
 
   resources :games do
-    resources :guesses
+    resources :guesses, only: [:create]
   end
 
   root 'games#index'

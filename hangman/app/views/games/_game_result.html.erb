@@ -1,9 +1,10 @@
-<% if @game.game_finished? %>
+<h2>Game Results:</h2>
 
-  <%= render 'game_success' %>
+<p>
+  <strong><%= gameover_message(@game.won?) %></strong>
+</p>
 
-<% else %>
-
-  <%= render 'make_guess' %>
-
-<% end %>
+<p>
+  <strong>The word was:</strong>
+  <%= @game.secret_word %>
+</p>

@@ -1,9 +1,8 @@
 <h2>Make a Guess:</h2>
 
 <%= form_with(model: [ @game, @game.guesses.build ], local: true) do |form| %>
-
   <%= render 'flash' %>
-
+  
   <p>
     <%= form.label :letter %>
     <%= form.text_field :letter, autofocus: true %>

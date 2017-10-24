@@ -1,9 +1,25 @@
 <h2>Game Information:</h2>
 
-<%= render 'masked_letters' %>
+<p>
+  <strong>Masked Letters:</strong>
+  <%= masked_letters(@game.secret_word.chars, @game.guessed_letters) %>
+</p>
 
-<%= render 'word_length' %>
+<p>
+  <strong>Word Length:</strong>
+  <%= @game.secret_word.length %>
+</p>
 
-<%= render 'remaining_lives' %>
+<p>
+  <strong>Remaining Lives:</strong>
+  <%= @game.lives %>
+</p>
 
-<%= render 'guessed_letters' %>
+<p>
+  <strong>Guessed Letters:</strong>
+  <% if @game.guessed_letters.any? %>
+    <%= @game.guessed_letters.join(' ') %>
+  <% else %>
+    No guesses have been made
+  <% end %>
+</p>

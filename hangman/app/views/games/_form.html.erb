@@ -1,15 +1,11 @@
 <%= form_with(model: @game, local: true) do |form| %>
-
   <%= render 'error' %>
 
-  <!-- TODO local error handling, form helper rails helper/tool -->
   <p>
     <%= form.label :secret_word %><br>
     <%= form.text_field :secret_word, autofocus: true %>
   </p>
-
   <p>
     <%= form.submit %>
   </p>
-
 <% end %>

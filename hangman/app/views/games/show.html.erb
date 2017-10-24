@@ -2,7 +2,11 @@
 
 <%= render 'game_information' %>
 
-<%= render 'game_result' %>
+<% if @game.finished? %>
+  <%= render 'game_result' %>
+<% else %>
+  <%= render 'make_guess' %>
+<% end %>
 
 <%= link_to 'Edit', edit_game_path(@game) %>
 <%= link_to 'Back', games_path %>
